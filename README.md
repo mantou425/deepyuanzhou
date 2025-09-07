@@ -1,2 +1,1 @@
-# deepyuanzhou
-AI
+旅游
