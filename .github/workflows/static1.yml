@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>圆周旅迹 - 快速旅游攻略生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+        }
+        
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .form-section {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .preview-section {
+            flex: 2;
+            min-width: 300px;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        h2 {
+            color: #2575fc;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            background: #f5f7ff;
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+        
+        .checkbox-item input {
+            width: auto;
+            margin-right: 5px;
+        }
+        
+        button {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #5a0fb8;
+        }
+        
+        .itinerary {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+        
+        .day {
+            margin-bottom: 25px;
+            border-left: 4px solid #6a11cb;
+            padding-left: 15px;
+        }
+        
+        .day-title {
+            font-size: 1.3rem;
+            color: #6a11cb;
+            margin-bottom: 10px;
+        }
+        
+        .activity {
+            background: #f9f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .activity-time {
+            font-weight: 600;
+            color: #2575fc;
+            margin-bottom: 5px;
+        }
+        
+        .activity-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .activity-desc {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .destination-tag {
+            display: inline-block;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 0.9rem;
+        }
+        
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            padding: 20px;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>圆周旅迹</h1>
+            <p>快速生成个性化旅游攻略，让您的旅行更加轻松愉快</p>
+        </header>
+        
+        <div class="app-container">
+            <div class="form-section">
+                <h2>创建您的旅行计划</h2>
+                
+                <div class="form-group">
+                    <label for="destination">目的地</label>
+                    <input type="text" id="destination" placeholder="输入城市或景点名称">
+                </div>
+                
+                <div class="form-group">
+                    <label for="days">旅行天数</label>
+                    <select id="days">
+                        <option value="1">1天</option>
+                        <option value="2">2天</option>
+                        <option value="3" selected>3天</option>
+                        <option value="4">4天</option>
+                        <option value="5">5天</option>
+                        <option value="7">7天</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>旅行偏好</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="food" checked>
+                            <label for="food">美食</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="culture" checked>
+                            <label for="culture">文化</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="nature" checked>
+                            <label for="nature">自然</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="shopping">
+                            <label for="shopping">购物</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="adventure">
+                            <label for="adventure">冒险</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="budget">预算水平</label>
+                    <select id="budget">
+                        <option value="low">经济型</option>
+                        <option value="medium" selected>舒适型</option>
+                        <option value="high">豪华型</option>
+                    </select>
+                </div>
+                
+                <button id="generate-btn">生成旅游攻略</button>
+            </div>
+            
+            <div class="preview-section">
+                <h2>您的旅行攻略</h2>
+                <div class="itinerary" id="itinerary">
+                    <p class="placeholder">请填写左侧信息并点击"生成旅游攻略"</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 圆周旅迹 - 让旅行更简单</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const generateBtn = document.getElementById('generate-btn');
+            const itineraryContainer = document.getElementById('itinerary');
+            
+            generateBtn.addEventListener('click', function() {
+                const destination = document.getElementById('destination').value || '未知目的地';
+                const days = parseInt(document.getElementById('days').value);
+                const budget = document.getElementById('budget').value;
+                
+                // 获取选中的偏好
+                const preferences = [];
+                if (document.getElementById('food').checked) preferences.push('美食');
+                if (document.getElementById('culture').checked) preferences.push('文化');
+                if (document.getElementById('nature').checked) preferences.push('自然');
+                if (document.getElementById('shopping').checked) preferences.push('购物');
+                if (document.getElementById('adventure').checked) preferences.push('冒险');
+                
+                // 生成攻略
+                generateItinerary(destination, days, preferences, budget);
+            });
+            
+            function generateItinerary(destination, days, preferences, budget) {
+                let html = `<h3>${destination} ${days}天旅行攻略</h3>`;
+                html += `<div class="preferences">`;
+                preferences.forEach(pref => {
+                    html += `<span class="destination-tag">${pref}</span>`;
+                });
+                html += `</div>`;
+                
+                for (let i = 1; i <= days; i++) {
+                    html += `
+                    <div class="day">
+                        <div class="day-title">第${i}天</div>
+                        <div class="activity">
+                            <div class="activity-time">上午</div>
+                            <div class="activity-title">参观${destination}著名景点</div>
+                            <div class="activity-desc">探索当地最具代表性的地标和景点，感受${destination}的独特魅力。</div>
+                        </div>
+                        <div class="activity">
+                            <div class="activity-time">中午</div>
+                            <div class="activity-title">品尝当地美食</div>
+                            <div class="activity-desc">在${preferences.includes('美食') ? '知名餐厅' : '当地餐馆'}享用正宗的地方菜肴。</div>
+                        </div>
+                        <div class="activity">
+                            <div class="activity-time">下午</div>
+                            <div class="activity-title">${getAfternoonActivity(preferences)}</div>
+                            <div class="activity-desc">${getAfternoonDescription(preferences, destination)}</div>
+                        </div>
+                        <div class="activity">
+                            <div class="activity-time">晚上</div>
+                            <div class="activity-title">${getEveningActivity(preferences)}</div>
+                            <div class="activity-desc">${getEveningDescription(preferences, budget, destination)}</div>
+                        </div>
+                    </div>`;
+                }
+                
+                // 添加实用信息部分
+                html += `
+                <div class="day">
+                    <div class="day-title">实用信息</div>
+                    <div class="activity">
+                        <div class="activity-title">交通</div>
+                        <div class="activity-desc">${destination}的公共交通系统发达，建议使用地铁和公交出行。</div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-title">住宿</div>
+                        <div class="activity-desc">建议住在市中心区域，方便前往各主要景点。</div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-title">预算</div>
+                        <div class="activity-desc">${getBudgetDescription(budget)}</div>
+                    </div>
+                </div>`;
+                
+                itineraryContainer.innerHTML = html;
+            }
+            
+            function getAfternoonActivity(preferences) {
+                if (preferences.includes('购物')) return '购物体验';
+                if (preferences.includes('文化')) return '博物馆与历史遗迹';
+                if (preferences.includes('自然')) return '公园与自然景观';
+                return '城市探索';
+            }
+            
+            function getAfternoonDescription(preferences, destination) {
+                if (preferences.includes('购物')) return `探索${destination}的购物区和特色市场，寻找独特的纪念品和当地产品。`;
+                if (preferences.includes('文化')) return `参观${destination}的博物馆、历史建筑和文化遗址，了解当地丰富的历史和文化传承。`;
+                if (preferences.includes('自然')) return `漫步于${destination}的公园、花园或自然景观，享受大自然的宁静与美丽。`;
+                return `继续探索${destination}的城市风光，感受当地的生活节奏和城市文化。`;
+            }
+            
+            function getEveningActivity(preferences) {
+                if (preferences.includes('美食')) return '晚餐与美食体验';
+                if (preferences.includes('文化')) return '文化表演';
+                return '城市夜景';
+            }
+            
+            function getEveningDescription(preferences, budget, destination) {
+                if (preferences.includes('美食')) {
+                    return `在${budget === 'high' ? '高级餐厅' : budget === 'medium' ? '特色餐厅' : '当地受欢迎的小吃店'}享用晚餐，品尝${destination}的地道美食。`;
+                }
+                if (preferences.includes('文化')) {
+                    return `观看${destination}的传统表演或现代艺术演出，体验当地的艺术文化氛围。`;
+                }
+                return `欣赏${destination}的城市夜景，可以选择观景台或河边散步，感受城市的夜晚魅力。`;
+            }
+            
+            function getBudgetDescription(budget) {
+                if (budget === 'low') {
+                    return '经济型旅行，建议预算为每天300-500元，选择青年旅社和经济型餐厅。';
+                } else if (budget === 'medium') {
+                    return '舒适型旅行，建议预算为每天600-900元，选择中等酒店和特色餐厅。';
+                } else {
+                    return '豪华型旅行，建议预算为每天1000元以上，选择高端酒店和精致餐饮体验。';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
